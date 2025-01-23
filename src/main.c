@@ -14,13 +14,15 @@ int main()
         {
             // set random pixel
             Pixel *pixel = new_pixel(
-                rand() % 256,
-                rand() % 256,
-                rand() % 256,
-                100.0);
+                // random color
+                (rand() % 0xff << 24) |
+                (rand() % 0xff << 16) |
+                (rand() % 0xff << 8) |
+                (rand() % 0xff));
             if (i == j)
             {
-                pixel->color->blue = 255;
+                // set blue part 0xff
+                pixel->hex = pixel->hex | 0x000000ff;
             }
             set_pixel(image, j, i, pixel);
         }

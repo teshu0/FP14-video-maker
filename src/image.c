@@ -2,46 +2,18 @@
 
 #include "image.h"
 
-// RGB に関する実装
-
-RGB *new_rgb(unsigned char red, unsigned char green, unsigned char blue)
-{
-    RGB *color = malloc(sizeof(RGB));
-    color->red = red;
-    color->green = green;
-    color->blue = blue;
-
-    return color;
-}
-
-RGB *new_black_color()
-{
-    RGB *color = malloc(sizeof(RGB));
-    color->red = 0;
-    color->green = 0;
-    color->blue = 0;
-
-    return color;
-}
-
-Pixel *new_pixel(unsigned char red, unsigned char green, unsigned char blue, float alpha)
+Pixel *new_pixel(uint32_t hex)
 {
     Pixel *pixel = malloc(sizeof(Pixel));
-    RGB *color = new_rgb(red, green, blue);
-
-    pixel->color = color;
-    pixel->alpha = alpha;
-
+    pixel->hex = hex;
     return pixel;
 }
 
-Pixel *new_black_pixel()
+Pixel *new_empty_pixel()
 {
     Pixel *pixel = malloc(sizeof(Pixel));
-    RGB *color = new_black_color();
 
-    pixel->color = color;
-    pixel->alpha = 100.0;
+    pixel->hex = 0xff000000;
 
     return pixel;
 }
@@ -50,21 +22,27 @@ Pixel *new_black_pixel()
 
 void print_pixel_hex(Pixel *pixel)
 {
-    printf("#%02x%02x%02x (%.02f)\n", pixel->color->red, pixel->color->green, pixel->color->blue, pixel->alpha);
+
+    printf("#%02x%02x%02x%02x\n",
+           (pixel->hex & 0xff000000) >> 24,
+           (pixel->hex & 0x00ff0000) >> 16,
+           (pixel->hex & 0x0000ff00) >> 8,
+           (pixel->hex & 0x000000ff));
 }
 
 // 画像に関する実装
 
 void _init_image(Image *image, unsigned int width, unsigned int height)
 {
-    Pixel **pixels = malloc(sizeof(Pixel) * width);
+    // init with 0x00000000
+    Pixel **pixels = malloc(sizeof(Pixel) * width * height);
     for (int i = 0; i < width; i++)
     {
         pixels[i] = malloc(sizeof(Pixel) * height);
 
         for (int j = 0; j < height; j++)
         {
-            pixels[i][j] = *new_black_pixel();
+            pixels[i][j] = *new_empty_pixel();
         }
     }
 
@@ -108,9 +86,9 @@ void save_image(Image *image, const char *filename)
     {
         for (int j = 0; j < image->width; j++)
         {
-            pixels[(i * image->width + j) * 3] = image->pixels[j][i].color->red;
-            pixels[(i * image->width + j) * 3 + 1] = image->pixels[j][i].color->green;
-            pixels[(i * image->width + j) * 3 + 2] = image->pixels[j][i].color->blue;
+            pixels[(i * image->width + j) * 3] = get_red(&image->pixels[j][i]);
+            pixels[(i * image->width + j) * 3 + 1] = get_green(&image->pixels[j][i]);
+            pixels[(i * image->width + j) * 3 + 2] = get_blue(&image->pixels[j][i]);
         }
     }
 
@@ -118,4 +96,24 @@ void save_image(Image *image, const char *filename)
     fwrite(pixels, sizeof(unsigned char), image->width * image->height * 3, file);
 
     fclose(file);
+}
+
+uint32_t get_red(Pixel *pixel)
+{
+    return (pixel->hex & 0x00ff0000) >> 16;
+}
+
+uint32_t get_green(Pixel *pixel)
+{
+    return (pixel->hex & 0x0000ff00) >> 8;
+}
+
+uint32_t get_blue(Pixel *pixel)
+{
+    return (pixel->hex & 0x000000ff);
+}
+
+uint32_t get_alpha(Pixel *pixel)
+{
+    return (pixel->hex & 0xff000000) >> 24;
 }

@@ -5,44 +5,27 @@
 
 #include "array.h"
 
-/// @brief RGB値を表す構造体
-typedef struct
-{
-    unsigned char red;
-    unsigned char green;
-    unsigned char blue;
-} RGB;
-
-/// @brief RGB を作成してポインターを返す
-/// @param red
-/// @param green
-/// @param blue
-/// @return
-RGB *new_rgb(unsigned char red, unsigned char green, unsigned char blue);
-
-/// @brief 黒を取得する
-/// @param color
-RGB *new_black_color();
-
 /// @brief ピクセルを表す構造体で、色と透明度をもつ
 typedef struct
 {
-    RGB *color;
-    /// @brief 透明度を0から100で表す。0が完全透明、100が完全不透明
-    float alpha;
+    // RGB+alpha の16進数
+    uint32_t hex;
 } Pixel;
 
 /// @brief 新しいピクセルを作成し、ポインターを返す
-/// @param red
-/// @param green
-/// @param blue
-/// @param alpha
+/// @param uint32_t 16進数の色
 /// @return
-Pixel *new_pixel(unsigned char red, unsigned char green, unsigned char blue, float alpha);
+Pixel *new_pixel(uint32_t hex);
 
-/// @brief 不透明な黒のピクセルを取得
+/// @brief ゼロのピクセルを取得
 /// @param pixel
-Pixel *new_black_pixel();
+Pixel *new_empty_pixel();
+
+// カラーの取得
+uint32_t get_red(Pixel *pixel);
+uint32_t get_green(Pixel *pixel);
+uint32_t get_blue(Pixel *pixel);
+uint32_t get_alpha(Pixel *pixel);
 
 /// @brief ピクセルをRGB値としてプリントする
 /// @param pixel ピクセル
