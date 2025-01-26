@@ -1,0 +1,6 @@
+{
+    "files.associations": {
+        "*.cf": "editorconfig",
+        "sprite.h": "c"
+    }
+}

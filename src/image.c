@@ -12,9 +12,7 @@ Pixel *new_pixel(uint32_t hex)
 Pixel *new_empty_pixel()
 {
     Pixel *pixel = malloc(sizeof(Pixel));
-
-    pixel->hex = 0xff000000;
-
+    pixel->hex = 0x00000000;
     return pixel;
 }
 
@@ -36,13 +34,13 @@ void _init_image(Image *image, unsigned int width, unsigned int height)
 {
     // init with 0x00000000
     Pixel **pixels = malloc(sizeof(Pixel) * width * height);
-    for (int i = 0; i < width; i++)
+    for (int y = 0; y < height; y++)
     {
-        pixels[i] = malloc(sizeof(Pixel) * height);
+        pixels[y] = malloc(sizeof(Pixel) * width);
 
-        for (int j = 0; j < height; j++)
+        for (int x = 0; x < width; x++)
         {
-            pixels[i][j] = *new_empty_pixel();
+            pixels[y][x] = *new_empty_pixel();
         }
     }
 
@@ -55,6 +53,34 @@ Image *new_image(unsigned int width, unsigned int height)
 {
     Image *image = malloc(sizeof(Image));
     _init_image(image, width, height);
+
+    return image;
+}
+
+void _init_rgb_image(RGBImage *image, unsigned int width, unsigned int height)
+{
+    // init with 0x00000000
+    RGBPixel **pixels = malloc(sizeof(RGBPixel) * width * height);
+    for (int y = 0; y < height; y++)
+    {
+        pixels[y] = malloc(sizeof(RGBPixel) * width);
+
+        for (int x = 0; x < width; x++)
+        {
+            pixels[y][x] = *new_rgb_pixel(0x000000);
+        }
+    }
+
+    image->width = width;
+    image->height = height;
+    image->pixels = pixels;
+}
+
+RGBImage *new_rgb_image(unsigned int width, unsigned int height)
+{
+    RGBImage *image = malloc(sizeof(RGBImage));
+    _init_rgb_image(image, width, height);
+
     return image;
 }
 
@@ -69,7 +95,7 @@ void set_pixel(Image *image, unsigned int x, unsigned int y, Pixel *pixel)
     image->pixels[x][y] = *pixel;
 }
 
-void save_image(Image *image, const char *filename)
+void save_image(RGBImage *image, const char *filename)
 {
     FILE *file = fopen(filename, "wb");
     if (file == NULL)
@@ -82,13 +108,13 @@ void save_image(Image *image, const char *filename)
     fprintf(file, "P6\n%d %d\n255\n", image->width, image->height);
 
     unsigned char *pixels = malloc(sizeof(unsigned char) * image->width * image->height * 3); // 3 for rgb
-    for (int i = 0; i < image->height; i++)
+    for (int y = 0; y < image->height; y++)
     {
-        for (int j = 0; j < image->width; j++)
+        for (int x = 0; x < image->width; x++)
         {
-            pixels[(i * image->width + j) * 3] = get_red(&image->pixels[j][i]);
-            pixels[(i * image->width + j) * 3 + 1] = get_green(&image->pixels[j][i]);
-            pixels[(i * image->width + j) * 3 + 2] = get_blue(&image->pixels[j][i]);
+            pixels[(y * image->width + x) * 3] = get_red_rgb(&image->pixels[y][x]);
+            pixels[(y * image->width + x) * 3 + 1] = get_green_rgb(&image->pixels[y][x]);
+            pixels[(y * image->width + x) * 3 + 2] = get_blue_rgb(&image->pixels[y][x]);
         }
     }
 
@@ -98,22 +124,84 @@ void save_image(Image *image, const char *filename)
     fclose(file);
 }
 
-uint32_t get_red(Pixel *pixel)
+// Pixel
+
+uint32_t get_alpha_rgba(Pixel *pixel)
+{
+    return (pixel->hex & 0xff000000) >> 24;
+}
+
+uint32_t get_blue_rgba(Pixel *pixel)
 {
     return (pixel->hex & 0x00ff0000) >> 16;
 }
 
-uint32_t get_green(Pixel *pixel)
+uint32_t get_green_rgba(Pixel *pixel)
 {
     return (pixel->hex & 0x0000ff00) >> 8;
 }
 
-uint32_t get_blue(Pixel *pixel)
+uint32_t get_red_rgba(Pixel *pixel)
 {
     return (pixel->hex & 0x000000ff);
 }
 
-uint32_t get_alpha(Pixel *pixel)
+// RGBPixel
+uint32_t get_red_rgb(RGBPixel *pixel)
 {
-    return (pixel->hex & 0xff000000) >> 24;
+    return (pixel->hex & 0xff0000) >> 16;
+}
+
+uint32_t get_green_rgb(RGBPixel *pixel)
+{
+    return (pixel->hex & 0x00ff00) >> 8;
+}
+
+uint32_t get_blue_rgb(RGBPixel *pixel)
+{
+    return (pixel->hex & 0x0000ff);
+}
+
+RGBPixel *new_rgb_pixel(uint32_t hex)
+{
+    RGBPixel *rgb = malloc(sizeof(RGBPixel));
+    rgb->hex = hex;
+    return rgb;
+}
+
+RGBPixel *get_alpha_applied_pixel(Pixel *pixel)
+{
+    RGBPixel *rgb = malloc(sizeof(RGBPixel));
+    double alpha = (double)get_alpha_rgba(pixel) / 255.0;
+    unsigned int red = (unsigned int)(get_red_rgba(pixel) * alpha);
+    unsigned int green = (unsigned int)(get_green_rgba(pixel) * alpha);
+    unsigned int blue = (unsigned int)(get_blue_rgba(pixel) * alpha);
+
+    rgb->hex = (red << 16) | (green << 8) | blue;
+
+    return rgb;
+}
+
+RGBImage *convert_to_rgb_image(Image *image, uint32_t background_color)
+{
+    RGBImage *rgb_image = new_rgb_image(image->width, image->height);
+
+    for (int y = 0; y < image->height; y++)
+    {
+        for (int x = 0; x < image->width; x++)
+        {
+            Pixel pixel = image->pixels[y][x];
+            if (pixel.hex == 0x00000000)
+            {
+                rgb_image->pixels[y][x] = *new_rgb_pixel(background_color);
+            }
+            else
+            {
+                RGBPixel *rgb_pixel = get_alpha_applied_pixel(&pixel);
+                rgb_image->pixels[y][x] = *rgb_pixel;
+            }
+        }
+    }
+
+    return rgb_image;
 }
