@@ -9,7 +9,7 @@ SRC_DIR = src
 BUILD_DIR = build
 
 # ソースファイルを自動検出
-SRCS = $(wildcard $(SRC_DIR)/*.c)
+SRCS = $(shell find $(SRC_DIR) -name '*.c')
 
 # オブジェクトファイルのパスを生成
 OBJS = $(patsubst $(SRC_DIR)/%.c, $(BUILD_DIR)/%.o, $(SRCS))
@@ -23,7 +23,7 @@ $(TARGET): $(OBJS)
 
 # オブジェクトファイル生成ルール
 $(BUILD_DIR)/%.o: $(SRC_DIR)/%.c
-	@mkdir -p $(BUILD_DIR)
+	@mkdir -p $(dir $@)
 	$(CC) $(CFLAGS) -c $< -o $@
 
 # クリーンアップ
