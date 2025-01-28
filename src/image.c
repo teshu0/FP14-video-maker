@@ -107,14 +107,17 @@ void save_image(RGBImage *image, const char *filename)
     // file width, height, and max color value
     fprintf(file, "P6\n%d %d\n255\n", image->width, image->height);
 
-    unsigned char *pixels = malloc(sizeof(unsigned char) * image->width * image->height * 3); // 3 for rgb
+    unsigned int width = image->width;
+    unsigned int height = image->height;
+
+    unsigned char *pixels = malloc(sizeof(unsigned char) * width * height * 3); // 3 for rgb
     for (int y = 0; y < image->height; y++)
     {
-        for (int x = 0; x < image->width; x++)
+        for (int x = 0; x < width; x++)
         {
-            pixels[(y * image->width + x) * 3] = get_red_rgb(&image->pixels[y][x]);
-            pixels[(y * image->width + x) * 3 + 1] = get_green_rgb(&image->pixels[y][x]);
-            pixels[(y * image->width + x) * 3 + 2] = get_blue_rgb(&image->pixels[y][x]);
+            pixels[(y * width + x) * 3] = get_red_rgb(&image->pixels[y][x]);
+            pixels[(y * width + x) * 3 + 1] = get_green_rgb(&image->pixels[y][x]);
+            pixels[(y * width + x) * 3 + 2] = get_blue_rgb(&image->pixels[y][x]);
         }
     }
 

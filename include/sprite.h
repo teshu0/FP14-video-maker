@@ -21,7 +21,16 @@ Sprite *new_sprite(
     unsigned int height);
 
 // テスト用
-Sprite *new_debug_object();
-Sprite *new_debug_object_animated();
+Sprite *new_debug_square();
+Sprite *new_debug_horizontal();
+Sprite *new_debug_animated();
+
+/// @brief カービィのスプライトを取得
+/// @return
+Sprite *new_kirby_sprite();
+
+/// @brief 雲のスプライトを取得
+/// @return
+Sprite *new_cloud_sprite();
 
 #endif // SPRITE_H

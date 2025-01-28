@@ -7,9 +7,11 @@
 
 int main()
 {
-    Sprite *test = new_debug_object();
+    Sprite *sprite = new_debug_horizontal();
+    // Sprite *sprite = new_kirby_sprite();
+    // Sprite *sprite = new_cloud_sprite();
 
-    save_image(convert_to_rgb_image(test->images[0], 0x0f4faf), "output.ppm");
+    save_image(convert_to_rgb_image(sprite->images[0], 0x0f4faf), "output.ppm");
 
     // for (int i = 0; i < image->height; i++)
     // {

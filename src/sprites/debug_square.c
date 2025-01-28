@@ -57,7 +57,7 @@ Sprite *new_debug_object()
         {
             for (int x = 0; x < FRAME_WIDTH; x++)
             {
-                images[frame]->pixels[y][x] = *new_pixel(new_piskel_data[frame][y * FRAME_HEIGHT + x]);
+                images[frame]->pixels[y][x] = *new_pixel(new_piskel_data[frame][y * FRAME_WIDTH + x]);
             }
         }
     }
