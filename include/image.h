@@ -36,6 +36,7 @@ typedef struct
 
 RGBPixel *new_rgb_pixel(uint32_t hex);
 RGBPixel *get_alpha_applied_pixel(Pixel *pixel);
+RGBPixel *add_rgb_pixel(RGBPixel *left, Pixel *right);
 uint32_t get_red_rgb(RGBPixel *pixel);
 uint32_t get_green_rgb(RGBPixel *pixel);
 uint32_t get_blue_rgb(RGBPixel *pixel);
@@ -71,6 +72,11 @@ void _init_image(Image *image, unsigned int width, unsigned int height);
 /// @param height
 /// @return
 Image *new_image(unsigned int width, unsigned int height);
+
+/// @brief RGB 画像を作成する
+/// @param width
+/// @param height
+RGBImage *new_rgb_image(unsigned int width, unsigned int height);
 
 /// @brief 画像にピクセルをセットする
 /// @param image

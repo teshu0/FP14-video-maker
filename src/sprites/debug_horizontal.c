@@ -64,6 +64,7 @@ Sprite *new_debug_horizontal()
 
     Sprite *sprite = malloc(sizeof(images));
     sprite->images = images;
+    sprite->num_frames = FRAME_COUNT;
 
     return sprite;
 }

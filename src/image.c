@@ -185,6 +185,27 @@ RGBPixel *get_alpha_applied_pixel(Pixel *pixel)
     return rgb;
 }
 
+RGBPixel *add_rgb_pixel(RGBPixel *left, Pixel *right)
+{
+    uint32_t red_left = get_red_rgb(left);
+    uint32_t blue_left = get_blue_rgb(left);
+    uint32_t green_left = get_green_rgb(left);
+
+    double alpha_right = (double)get_alpha_rgba(right) / 255.0;
+    uint32_t red_right = get_red_rgba(right) * alpha_right;
+    uint32_t blue_right = get_blue_rgba(right) * alpha_right;
+    uint32_t green_right = get_green_rgba(right) * alpha_right;
+
+    double alpha_sum = 1 + alpha_right;
+
+    uint32_t red = ((red_left + red_right) > 255 ? 255 : (red_left + red_right));
+    uint32_t blue = ((blue_left + blue_right) > 255 ? 255 : (blue_left + blue_right));
+    uint32_t green = ((green_left + green_right) > 255 ? 255 : (green_left + green_right));
+
+    return new_rgb_pixel(
+        (red << 16) + (blue << 8) + green);
+}
+
 RGBImage *convert_to_rgb_image(Image *image, uint32_t background_color)
 {
     RGBImage *rgb_image = new_rgb_image(image->width, image->height);

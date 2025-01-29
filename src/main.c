@@ -1,39 +1,41 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <sys/stat.h>
 
-#include "array.h"
+// #include "array.h"
 #include "image.h"
 #include "sprite.h"
+#include "video.h"
+
+#define OUTPUT_PATH = "./output"
+
+void move_kirby(int frame, unsigned int *x, unsigned int *y)
+{
+    *x += 4;
+    // *y += 4;
+}
 
 int main()
 {
-    Sprite *sprite = new_debug_horizontal();
-    // Sprite *sprite = new_kirby_sprite();
-    // Sprite *sprite = new_cloud_sprite();
 
-    save_image(convert_to_rgb_image(sprite->images[0], 0x0f4faf), "output.ppm");
+    Sprite *debug_1 = new_debug_horizontal();
+    Sprite *debug_2 = new_debug_square();
 
-    // for (int i = 0; i < image->height; i++)
-    // {
-    //     for (int j = 0; j < image->width; j++)
-    //     {
-    //         // set random pixel
-    //         Pixel *pixel = new_pixel(
-    //             // random color
-    //             (rand() % 0xff << 24) |
-    //             (rand() % 0xff << 16) |
-    //             (rand() % 0xff << 8) |
-    //             (rand() % 0xff));
-    //         if (i == j)
-    //         {
-    //             // set blue part 0xff
-    //             pixel->hex = pixel->hex | 0x000000ff;
-    //         }
-    //         set_pixel(image, j, i, pixel);
-    //     }
-    // }
+    Sprite *kirby = new_kirby_sprite();
+    Sprite *cloud = new_cloud_sprite();
 
-    // save_image(image, "output.ppm");
+    Layer *layer_debug_1 = new_layer(debug_1, 0, 0, NULL);
+    Layer *layer_debug_2 = new_layer(debug_2, 0, 0, NULL);
+    Layer *layer_kirby = new_layer(kirby, 16, 16, *move_kirby);
+    Layer *layer_cloud = new_layer(cloud, -100, 0, NULL);
+
+    Scene *scene = new_scene(64, 64);
+    // add_layer(scene, layer_debug_1);
+    add_layer(scene, layer_debug_2);
+    add_layer(scene, layer_kirby);
+    // add_layer(scene, layer_cloud);
+
+    renderling_loop(scene, 10, "./output", 0xF0F0F0);
 
     return 0;
 }
