@@ -33,4 +33,12 @@ Sprite *new_kirby_sprite();
 /// @return
 Sprite *new_cloud_sprite();
 
+/// @brief 背景のスプライト
+/// @return
+Sprite *new_background_sprite();
+
+/// @brief 床のスプライト
+/// @return
+Sprite *new_floor_sprite();
+
 #endif // SPRITE_H

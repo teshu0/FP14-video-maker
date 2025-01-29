@@ -3,6 +3,8 @@
 #ifndef VIDEO_H
 #define VIDEO_H
 
+#include <stdbool.h>
+
 #include "image.h"
 #include "sprite.h"
 
@@ -13,6 +15,7 @@ typedef struct
     unsigned int x;
     unsigned int y;
     void (*render_callback)(int frame, unsigned int *x, unsigned int *y);
+    bool should_clip;
 } Layer;
 
 /// @brief 初期位置を含めて新しいレイヤーを作成する
@@ -20,7 +23,7 @@ typedef struct
 /// @param x
 /// @param y
 /// @return
-Layer *new_layer(Sprite *sprite, unsigned int x, unsigned int y, void (*callback)(int frame, unsigned int *x, unsigned int *y));
+Layer *new_layer(Sprite *sprite, unsigned int x, unsigned int y, bool should_clip, void (*callback)(int frame, unsigned int *x, unsigned int *y));
 
 /// @brief レイヤーの配列をもつシーン
 typedef struct

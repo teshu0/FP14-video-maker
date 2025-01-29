@@ -1,14 +1,16 @@
 #include <stdio.h>
+#include <stdbool.h>
 
 #include "video.h"
 #include "image.h"
 
-Layer *new_layer(Sprite *sprite, unsigned int x, unsigned int y, void (*callback)(int frame, unsigned int *x, unsigned int *y))
+Layer *new_layer(Sprite *sprite, unsigned int x, unsigned int y, bool should_clip, void (*callback)(int frame, unsigned int *x, unsigned int *y))
 {
     Layer *layer = malloc(sizeof(Layer));
     layer->sprite = sprite;
     layer->x = x;
     layer->y = y;
+    layer->should_clip = should_clip;
     layer->render_callback = callback;
     return layer;
 }
@@ -54,19 +56,21 @@ RGBImage *render_scene(Scene *scene, unsigned int current_frame, uint32_t backgr
 
         for (int y = 0; y < sprite->images[frame_index]->height; y++)
         {
-            if (y + offset_y >= scene->height)
+            if (y + offset_y >= scene->height) // || layer->should_clip
             {
                 continue; // はみ出し
             }
             for (int x = 0; x < sprite->images[frame_index]->width; x++)
             {
-                if (x + offset_x >= scene->width)
+                if (x + offset_x >= scene->width && layer->should_clip)
                 {
                     continue; // はみ出し
                 }
+                int y_index = (y + offset_y) % scene->height;
+                int x_index = (x + offset_x) % scene->width;
 
                 Pixel pixel = sprite->images[frame_index]->pixels[y][x];
-                if (pixel.hex == 0xFF000000) // completely transparent
+                if (pixel.hex == 0xFF000000 || get_alpha_rgba(&pixel) == 0x00) // completely transparent
                 {
                     continue;
                 }
@@ -75,7 +79,7 @@ RGBImage *render_scene(Scene *scene, unsigned int current_frame, uint32_t backgr
                 RGBPixel *rgb_pixel = get_alpha_applied_pixel(&pixel);
 
                 // 加算合成
-                scene_image->pixels[y + offset_y][x + offset_x].hex = rgb_pixel->hex;
+                scene_image->pixels[y_index][x_index].hex = rgb_pixel->hex;
             }
         }
     }
