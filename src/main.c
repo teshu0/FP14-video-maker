@@ -49,7 +49,7 @@ void move_floor_backward(int frame, unsigned int *x, unsigned int *y)
 int main()
 {
 
-    Sprite *debug_1 = new_debug_horizontal();
+    // Sprite *debug_1 = new_debug_horizontal();
     Sprite *debug_2 = new_debug_square();
 
     Sprite *kirby = new_kirby_sprite();
@@ -57,7 +57,7 @@ int main()
     Sprite *background = new_background_sprite();
     Sprite *floor = new_floor_sprite();
 
-    Layer *layer_debug_1 = new_layer(debug_1, 0, 0, false, NULL);
+    // Layer *layer_debug_1 = new_layer(debug_1, 0, 0, false, NULL);
     Layer *layer_debug_2 = new_layer(debug_2, 0, 0, false, NULL);
     Layer *layer_kirby = new_layer(kirby, 16, 100 - 16, false, move_kirby_forward);
     Layer *layer_cloud = new_layer(cloud, -40, -20, false, move_cloud_backward);
@@ -68,9 +68,9 @@ int main()
     // add_layer(scene, layer_debug_1);
     add_layer(scene, layer_background);
     add_layer(scene, layer_floor);
-    add_layer(scene, layer_debug_2);
     add_layer(scene, layer_kirby);
     add_layer(scene, layer_cloud);
+    add_layer(scene, layer_debug_2);
 
     renderling_loop(scene, 24 * 10, "./output", 0xF0F0F0);
 
